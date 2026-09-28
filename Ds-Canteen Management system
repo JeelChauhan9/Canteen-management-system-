@@ -1,0 +1,794 @@
+#include <iostream.h>
+#include <conio.h>
+#include <string.h>
+
+#define SIZE 10
+
+struct Order
+{
+int orderId;
+char customer[30];
+char food[30];
+int quantity;
+float amount;
+Order *next;
+};
+
+struct QueueNode
+{
+int orderId;
+char customer[30];
+char food[30];
+int quantity;
+float amount;
+QueueNode *next;
+};
+
+struct StackNode
+{
+int orderId;
+char customer[30];
+char food[30];
+int quantity;
+float amount;
+StackNode *next;
+};
+
+struct Food
+{
+char name[30];
+float price;
+};
+
+class Canteen
+{
+Food menu[SIZE];
+
+int foodCount;  
+int nextOrderId;  
+
+Order *head;  
+
+QueueNode *front;  
+QueueNode *rear;  
+
+StackNode *top;
+
+public:
+
+Canteen()  
+{  
+    foodCount = 6;  
+    nextOrderId = 1001;  
+
+    head = NULL;  
+    front = NULL;  
+    rear = NULL;  
+    top = NULL;  
+
+    strcpy(menu[0].name, "Burger");  
+    menu[0].price = 50;  
+
+    strcpy(menu[1].name, "Pizza");  
+    menu[1].price = 100;  
+
+    strcpy(menu[2].name, "Sandwich");  
+    menu[2].price = 60;  
+
+    strcpy(menu[3].name, "Samosa");  
+    menu[3].price = 20;  
+
+    strcpy(menu[4].name, "ColdDrink");  
+    menu[4].price = 40;  
+
+    strcpy(menu[5].name, "Coffee");  
+    menu[5].price = 30;  
+}  
+
+/* SEARCH FOOD */  
+int searchFood(char foodName[])  
+{  
+    int i;  
+
+    for(i = 0; i < foodCount; i++)  
+    {  
+        if(strcmp(menu[i].name, foodName) == 0)  
+        {  
+            return i;  
+        }  
+    }  
+
+    return -1;  
+}  
+
+/* SEARCH ORDER */  
+Order* searchOrder(int orderId)  
+{  
+    Order *temp;  
+
+    temp = head;  
+
+    while(temp != NULL)  
+    {  
+        if(temp->orderId == orderId)  
+        {  
+            return temp;  
+        }  
+
+        temp = temp->next;  
+    }  
+
+    return NULL;  
+}  
+
+/* ADD ORDER - LINKED LIST */  
+void addOrder(  
+    int orderId,  
+    char customer[],  
+    char food[],  
+    int quantity,  
+    float amount)  
+{  
+    Order *newOrder;  
+    Order *temp;  
+
+    newOrder = new Order;  
+
+    newOrder->orderId = orderId;  
+
+    strcpy(newOrder->customer, customer);  
+    strcpy(newOrder->food, food);  
+
+    newOrder->quantity = quantity;  
+    newOrder->amount = amount;  
+
+    newOrder->next = NULL;  
+
+    if(head == NULL)  
+    {  
+        head = newOrder;  
+    }  
+    else  
+    {  
+        temp = head;  
+
+        while(temp->next != NULL)  
+        {  
+            temp = temp->next;  
+        }  
+
+        temp->next = newOrder;  
+    }  
+}  
+
+/* REMOVE ORDER */  
+Order* removeOrder(int orderId)  
+{  
+    Order *temp;  
+    Order *previous;  
+
+    temp = head;  
+    previous = NULL;  
+
+    while(temp != NULL)  
+    {  
+        if(temp->orderId == orderId)  
+        {  
+            if(previous == NULL)  
+            {  
+                head = temp->next;  
+            }  
+            else  
+            {  
+                previous->next = temp->next;  
+            }  
+
+            return temp;  
+        }  
+
+        previous = temp;  
+        temp = temp->next;  
+    }  
+
+    return NULL;  
+}  
+
+/* ENQUEUE - QUEUE */  
+void enqueue(  
+    int orderId,  
+    char customer[],  
+    char food[],  
+    int quantity,  
+    float amount)  
+{  
+    QueueNode *newNode;  
+
+    newNode = new QueueNode;  
+
+    newNode->orderId = orderId;  
+
+    strcpy(newNode->customer, customer);  
+    strcpy(newNode->food, food);  
+
+    newNode->quantity = quantity;  
+    newNode->amount = amount;  
+
+    newNode->next = NULL;  
+
+    if(rear == NULL)  
+    {  
+        front = newNode;  
+        rear = newNode;  
+    }  
+    else  
+    {  
+        rear->next = newNode;  
+        rear = newNode;  
+    }  
+
+    cout << "\nOrder added to pending queue.";  
+}  
+
+/* DEQUEUE - QUEUE */  
+QueueNode* dequeue()  
+{  
+    QueueNode *temp;  
+
+    if(front == NULL)  
+    {  
+        return NULL;  
+    }  
+
+    temp = front;  
+
+    front = front->next;  
+
+    if(front == NULL)  
+    {  
+        rear = NULL;  
+    }  
+
+    return temp;  
+}  
+
+/* PUSH - STACK */  
+void push(  
+    int orderId,  
+    char customer[],  
+    char food[],  
+    int quantity,  
+    float amount)  
+{  
+    StackNode *newNode;  
+
+    newNode = new StackNode;  
+
+    newNode->orderId = orderId;  
+
+    strcpy(newNode->customer, customer);  
+    strcpy(newNode->food, food);  
+
+    newNode->quantity = quantity;  
+    newNode->amount = amount;  
+
+    newNode->next = top;  
+
+    top = newNode;  
+}  
+
+/* SHOW FOOD MENU */  
+void showMenu()  
+{  
+    int i;  
+
+    clrscr();  
+
+    cout << "====================================\n";  
+    cout << "            FOOD MENU\n";  
+    cout << "====================================\n\n";  
+
+    for(i = 0; i < foodCount; i++)  
+    {  
+        cout << i + 1 << ". "  
+             << menu[i].name  
+             << " - Rs. "  
+             << menu[i].price  
+             << "\n";  
+    }  
+
+    getch();  
+}  
+
+/* SEARCH FOOD MENU */  
+void searchFoodMenu()  
+{  
+    char foodName[30];  
+    int position;  
+
+    clrscr();  
+
+    cout << "====================================\n";  
+    cout << "           SEARCH FOOD\n";  
+    cout << "====================================\n";  
+
+    cout << "\nFood Name : ";  
+    cin >> foodName;  
+
+    position = searchFood(foodName);  
+
+    if(position != -1)  
+    {  
+        cout << "\nFood Found!";  
+
+        cout << "\n\nFood Name : "  
+             << menu[position].name;  
+
+        cout << "\nPrice     : Rs. "  
+             << menu[position].price;  
+    }  
+    else  
+    {  
+        cout << "\nFood item not found.";  
+    }  
+
+    getch();  
+}  
+
+/* PLACE ORDER */  
+void placeOrder()  
+{  
+    char customer[30];  
+    char foodName[30];  
+
+    int position;  
+    int quantity;  
+    int orderId;  
+
+    float amount;  
+
+    clrscr();  
+
+    cout << "====================================\n";  
+    cout << "             PLACE ORDER\n";  
+    cout << "====================================\n";  
+
+    cout << "\nCustomer Name : ";  
+    cin >> customer;  
+
+    cout << "Food Name     : ";  
+    cin >> foodName;  
+
+    position = searchFood(foodName);  
+
+    if(position == -1)  
+    {  
+        cout << "\nFood item not found.";  
+
+        getch();  
+        return;  
+    }  
+
+    cout << "Quantity      : ";  
+    cin >> quantity;  
+
+    if(quantity <= 0)  
+    {  
+        cout << "\nInvalid quantity.";  
+
+        getch();  
+        return;  
+    }  
+
+    orderId = nextOrderId;  
+
+    nextOrderId++;  
+
+    amount = menu[position].price * quantity;  
+
+    addOrder(  
+        orderId,  
+        customer,  
+        menu[position].name,  
+        quantity,  
+        amount  
+    );  
+
+    enqueue(  
+        orderId,  
+        customer,  
+        menu[position].name,  
+        quantity,  
+        amount  
+    );  
+
+    cout << "\n\nOrder placed successfully.";  
+
+    cout << "\n\nOrder ID      : "  
+         << orderId;  
+
+    cout << "\nCustomer Name : "  
+         << customer;  
+
+    cout << "\nFood          : "  
+         << menu[position].name;  
+
+    cout << "\nQuantity      : "  
+         << quantity;  
+
+    cout << "\nTotal Amount  : Rs. "  
+         << amount;  
+
+    getch();  
+}  
+
+/* COMPLETE ORDER */  
+void completeOrder()  
+{  
+    QueueNode *order;  
+    Order *removed;  
+
+    clrscr();  
+
+    cout << "====================================\n";  
+    cout << "          COMPLETE ORDER\n";  
+    cout << "====================================\n";  
+
+    if(front == NULL)  
+    {  
+        cout << "\nNo pending orders.";  
+
+        getch();  
+        return;  
+    }  
+
+    order = dequeue();  
+
+    removed = removeOrder(order->orderId);  
+
+    push(  
+        order->orderId,  
+        order->customer,  
+        order->food,  
+        order->quantity,  
+        order->amount  
+    );  
+
+    if(removed != NULL)  
+    {  
+        delete removed;  
+    }  
+
+    cout << "\nOrder completed successfully.";  
+
+    cout << "\n\nOrder ID      : "  
+         << order->orderId;  
+
+    cout << "\nCustomer Name : "  
+         << order->customer;  
+
+    cout << "\nFood          : "  
+         << order->food;  
+
+    cout << "\nQuantity      : "  
+         << order->quantity;  
+
+    cout << "\nAmount        : Rs. "  
+         << order->amount;  
+
+    delete order;  
+
+    getch();  
+}  
+
+/* SHOW ALL ORDERS */  
+void showOrders()  
+{  
+    Order *temp;  
+
+    clrscr();  
+
+    cout << "====================================\n";  
+    cout << "           ALL ORDERS\n";  
+    cout << "====================================\n";  
+
+    temp = head;  
+
+    if(temp == NULL)  
+    {  
+        cout << "\nNo pending orders.";  
+
+        getch();  
+        return;  
+    }  
+
+    while(temp != NULL)  
+    {  
+        cout << "\nOrder ID      : "  
+             << temp->orderId;  
+
+        cout << "\nCustomer Name : "  
+             << temp->customer;  
+
+        cout << "\nFood          : "  
+             << temp->food;  
+
+        cout << "\nQuantity      : "  
+             << temp->quantity;  
+
+        cout << "\nAmount        : Rs. "  
+             << temp->amount;  
+
+        cout << "\n-----------------------------";  
+
+        temp = temp->next;  
+    }  
+
+    getch();  
+}  
+
+/* SEARCH ORDER MENU */  
+void searchOrderMenu()  
+{  
+    int orderId;  
+    Order *order;  
+
+    clrscr();  
+
+    cout << "====================================\n";  
+    cout << "           SEARCH ORDER\n";  
+    cout << "====================================\n";  
+
+    cout << "\nOrder ID : ";  
+    cin >> orderId;  
+
+    order = searchOrder(orderId);  
+
+    if(order != NULL)  
+    {  
+        cout << "\nOrder Found!";  
+
+        cout << "\n\nOrder ID      : "  
+             << order->orderId;  
+
+        cout << "\nCustomer Name : "  
+             << order->customer;  
+
+        cout << "\nFood          : "  
+             << order->food;  
+
+        cout << "\nQuantity      : "  
+             << order->quantity;  
+
+        cout << "\nAmount        : Rs. "  
+             << order->amount;  
+    }  
+    else  
+    {  
+        cout << "\nOrder not found or already completed.";  
+    }  
+
+    getch();  
+}  
+
+/* SHOW PENDING QUEUE */  
+void showQueue()  
+{  
+    QueueNode *temp;  
+
+    clrscr();  
+
+    cout << "====================================\n";  
+    cout << "          PENDING ORDERS\n";  
+    cout << "====================================\n";  
+
+    temp = front;  
+
+    if(temp == NULL)  
+    {  
+        cout << "\nQueue is empty.";  
+
+        getch();  
+        return;  
+    }  
+
+    cout << "\nFRONT\n";  
+
+    while(temp != NULL)  
+    {  
+        cout << "\nOrder "  
+             << temp->orderId  
+             << " - "  
+             << temp->customer  
+             << " - "  
+             << temp->food;  
+
+        temp = temp->next;  
+    }  
+
+    cout << "\n\nREAR";  
+
+    getch();  
+}  
+
+/* SHOW COMPLETED ORDER HISTORY */  
+void showHistory()  
+{  
+    StackNode *temp;  
+
+    clrscr();  
+
+    cout << "====================================\n";  
+    cout << "         COMPLETED ORDERS\n";  
+    cout << "====================================\n";  
+
+    temp = top;  
+
+    if(temp == NULL)  
+    {  
+        cout << "\nNo order history available.";  
+
+        getch();  
+        return;  
+    }  
+
+    cout << "\nTOP\n";  
+
+    while(temp != NULL)  
+    {  
+        cout << "\nOrder "  
+             << temp->orderId  
+             << " - "  
+             << temp->customer  
+             << " - "  
+             << temp->food;  
+
+        cout << "\nAmount : Rs. "  
+             << temp->amount;  
+
+        cout << "\n-----------------------------";  
+
+        temp = temp->next;  
+    }  
+
+    getch();  
+}  
+
+/* STATISTICS */  
+void statistics()  
+{  
+    int pending = 0;  
+    int completed = 0;  
+    int totalOrders = 0;  
+
+    QueueNode *queueTemp;  
+    StackNode *stackTemp;  
+
+    clrscr();  
+
+    queueTemp = front;  
+
+    while(queueTemp != NULL)  
+    {  
+        pending++;  
+
+        queueTemp = queueTemp->next;  
+    }  
+
+    stackTemp = top;  
+
+    while(stackTemp != NULL)  
+    {  
+        completed++;  
+
+        stackTemp = stackTemp->next;  
+    }  
+
+    totalOrders = pending + completed;  
+
+    cout << "====================================\n";  
+    cout << "          CANTEEN STATISTICS\n";  
+    cout << "====================================\n";  
+
+    cout << "\nTotal Orders     : "  
+         << totalOrders;  
+
+    cout << "\nPending Orders   : "  
+         << pending;  
+
+    cout << "\nCompleted Orders : "  
+         << completed;  
+
+    cout << "\nFood Items       : "  
+         << foodCount;  
+
+    getch();  
+}  
+
+/* MAIN MENU */  
+void mainMenu()  
+{  
+    int choice;  
+
+    do  
+    {  
+        clrscr();  
+
+        cout << "====================================\n";  
+        cout << "          CANTEEN MANAGEMENT\n";  
+        cout << "====================================\n";  
+
+        cout << "\n1. Show Food Menu";  
+        cout << "\n2. Search Food";  
+        cout << "\n3. Place Order";  
+        cout << "\n4. Complete Order";  
+        cout << "\n5. Show All Orders";  
+        cout << "\n6. Search Order";  
+        cout << "\n7. Show Pending Queue";  
+        cout << "\n8. Show Order History";  
+        cout << "\n9. Show Statistics";  
+        cout << "\n10. Exit";  
+
+        cout << "\n\nEnter Choice : ";  
+        cin >> choice;  
+
+        switch(choice)  
+        {  
+            case 1:  
+                showMenu();  
+                break;  
+
+            case 2:  
+                searchFoodMenu();  
+                break;  
+
+            case 3:  
+                placeOrder();  
+                break;  
+
+            case 4:  
+                completeOrder();  
+                break;  
+
+            case 5:  
+                showOrders();  
+                break;  
+
+            case 6:  
+                searchOrderMenu();  
+                break;  
+
+            case 7:  
+                showQueue();  
+                break;  
+
+            case 8:  
+                showHistory();  
+                break;  
+
+            case 9:  
+                statistics();  
+                break;  
+
+            case 10:  
+                cout << "\nThank you!";  
+                break;  
+
+            default:  
+                cout << "\nInvalid choice.";  
+                getch();  
+        }  
+
+    }while(choice != 10);  
+}
+
+};
+
+void main()
+{
+Canteen canteen;
+
+canteen.mainMenu();
+
+}
+
+Here is the code
